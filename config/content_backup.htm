@@ -1,5 +1,5 @@
 <h1>About</h1>
-<p>:DD</p>
+<p>做完w2嘞嘞嘞</p>
 <p>課程名稱: 計算機程式</p>
 <p>課程評分:</p>
 <p style="padding-left: 30px;"><span style="background-color: #ffff00;">學習心得報告 (60%)</span> - MS Teams 線上參與，<span style="background-color: #ccffcc;">6人一組</span>每三週發表學習心得。</p>
@@ -343,7 +343,52 @@ doc["aitetris"].bind("click", aitetris.do)
 <p><button id="kw_run2">Run</button> <button id="kw_output2">Output</button> <button id="kw_clear_console2">清除輸出區</button> <button onclick="location.reload()">Reload</button></p>
 <p><textarea id="kw_console2"></textarea></p>
 <div id="pyodide_div2"></div>
-<div id="mpl_output2"></div>
+<h1>w2</h1>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">################################################
+# 以下為導入 brython_robot 進行動態模擬的起始內容
+################################################
+# 導入 brython_robot.py 並設為 robot
+import brython_robot as robot
+# 導入 Brython browser 模組中的 timer
+# 以便讓 AnimatedRobot 可以正常運作
+from browser import timer
+
+# 初始化世界與機器人
+# 利用 robot 物件中的 World 方法
+# 建立一個 10x10 的模擬世界
+x = 11
+y = 11
+w = robot.World(x, y)
+# 利用 robot 物件的 AnimatedRobot 方法
+# 針對 w 進行動態模擬, 且讓機器人位於 (1, 1)
+r = robot.AnimatedRobot(w, 1, 1)
+################################################
+# 範例 1
+# 基本變數與數值操作
+################################################
+# r 為透過上列程式所建立的動態模擬機器人物件
+steps = (x-1)
+# 讓機器人往前移動 steps 步數
+def turn_rignt():
+    r.turn_left()
+    r.turn_left()
+    r.turn_left()
+
+def walk_two_line():
+    r.move(steps)
+    r.turn_left()
+    r.move(1)
+    r.turn_left()
+    r.move(steps)
+    turn_rignt()
+    r.move(1)
+    turn_rignt()
+
+z = int(x/2)
+for i in range(z):
+    walk_two_line()
+if x % 2 != 0:
+    r.move(steps)</pre>
 <div id="brython_div2"></div>
 <p>
 <script>
