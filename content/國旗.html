@@ -2,7 +2,7 @@
         <head>
         <title>cp2025_hw</title>
         <meta charset="utf-8">
-<meta property="head" content="H1">
+<meta property="head" content="H2">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="./../cmsimde/static/chimper/fonts/icomoon/style.css">
         <link rel="stylesheet" href="./../cmsimde/static/chimper/css/bootstrap.min.css">
@@ -142,53 +142,94 @@ img.add_border {
           </div>
           
         </header>
-    <div id="tipue_search_content">Pyodide3 << <a href='Pyodide3.html'>Previous</a> <a href='w3.html'>Next</a> >> w3<br /><h1>w2</h1>
-<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">################################################
-# 以下為導入 brython_robot 進行動態模擬的起始內容
-################################################
-# 導入 brython_robot.py 並設為 robot
-import brython_robot as robot
-# 導入 Brython browser 模組中的 timer
-# 以便讓 AnimatedRobot 可以正常運作
-from browser import timer
+    <div id="tipue_search_content">w12 << <a href='w12.html'>Previous</a> <a href='數字.html'>Next</a> >> 數字<br /><h1>國旗</h1>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false"># 畫中華民國國旗（含旋轉 90°、45°）
+from browser import document as doc
+from browser import html
+import math
 
-# 初始化世界與機器人
-# 利用 robot 物件中的 World 方法
-# 建立一個 10x10 的模擬世界
-x = 11
-y = 11
-w = robot.World(x, y)
-# 利用 robot 物件的 AnimatedRobot 方法
-# 針對 w 進行動態模擬, 且讓機器人位於 (1, 1)
-r = robot.AnimatedRobot(w, 1, 1)
-################################################
-# 範例 1
-# 基本變數與數值操作
-################################################
-# r 為透過上列程式所建立的動態模擬機器人物件
-steps = (x-1)
-# 讓機器人往前移動 steps 步數
-def turn_rignt():
-    r.turn_left()
-    r.turn_left()
-    r.turn_left()
+canvas = html.CANVAS(width = 600, height = 400)
+canvas.id = "taiwan_flag"
+brython_div = doc["brython_div1"]
+brython_div &lt;= canvas
 
-def walk_two_line():
-    r.move(steps)
-    r.turn_left()
-    r.move(1)
-    r.turn_left()
-    r.move(steps)
-    turn_rignt()
-    r.move(1)
-    turn_rignt()
+canvas = doc["taiwan_flag"]
+ctx = canvas.getContext("2d")
 
-z = int(x/2)
-for i in range(z):
-    walk_two_line()
-if x % 2 != 0:
-    r.move(steps)</pre>
-<br />Pyodide3 << <a href='Pyodide3.html'>Previous</a> <a href='w3.html'>Next</a> >> w3</div>
+#---------------------------------------------------------
+# 封裝成可重複畫國旗的函式（維持你原本的比例）
+#---------------------------------------------------------
+def draw_flag():
+    flag_w = 200
+    flag_h = 130
+    circle_x = flag_w/4
+    circle_y = flag_h/4
+
+    # 紅地
+    ctx.fillStyle='rgb(255, 0, 0)'
+    ctx.fillRect(0,0,flag_w,flag_h)
+
+    # 青天
+    ctx.fillStyle='rgb(0, 0, 150)'
+    ctx.fillRect(0,0,flag_w/2,flag_h/2)
+
+    # 十二道光芒白日
+    ctx.beginPath()
+    star_radius = flag_w/8
+    angle = 0
+    for i in range(24):
+        angle += 5*math.pi*2/12
+        toX = circle_x + math.cos(angle)*star_radius
+        toY = circle_y + math.sin(angle)*star_radius
+        if i:
+            ctx.lineTo(toX, toY)
+        else:
+            ctx.moveTo(toX, toY)
+    ctx.closePath()
+    ctx.fillStyle = '#fff'
+    ctx.fill()
+
+    # 藍圈
+    ctx.beginPath()
+    ctx.arc(circle_x, circle_y, flag_w*17/240, 0, math.pi*2)
+    ctx.closePath()
+    ctx.fillStyle = 'rgb(0,0,149)'
+    ctx.fill()
+
+    # 白心
+    ctx.beginPath()
+    ctx.arc(circle_x, circle_y, flag_w/16, 0, math.pi*2)
+    ctx.closePath()
+    ctx.fillStyle = '#fff'
+    ctx.fill()
+
+
+#---------------------------------------------------------
+# 依角度旋轉國旗 (θ 為度數)，並畫在指定中心點 (cx, cy)
+#---------------------------------------------------------
+def draw_rotated_flag(cx, cy, theta_deg):
+    ctx.save()
+    ctx.translate(cx, cy)
+    ctx.rotate(theta_deg * math.pi / 180)
+    ctx.translate(-100, -65)  # 調整到左上角 (flag_w/2, flag_h/2)
+    draw_flag()
+    ctx.restore()
+
+
+#---------------------------------------------------------
+# 在畫布內畫出 90° 與 45° 的國旗
+#---------------------------------------------------------
+
+# 清空背景
+ctx.fillStyle = "white"
+ctx.fillRect(0, 0, 600, 400)
+
+# 左：順時針 90 度
+draw_rotated_flag(150, 200, 90)
+
+# 右：順時針 45 度
+draw_rotated_flag(450, 200, 45)</pre>
+<p></p><br />w12 << <a href='w12.html'>Previous</a> <a href='數字.html'>Next</a> >> 數字</div>
         
     <!-- footer -->
       <div class="container">
