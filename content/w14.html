@@ -142,233 +142,207 @@ img.add_border {
           </div>
           
         </header>
-    <div id="tipue_search_content">w3 << <a href='w3.html'>Previous</a> <a href='w7 1b.html'>Next</a> >> w7 1b<br /><h1>w6</h1>
-<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">from browser import document, html, timer, bind
+    <div id="tipue_search_content">數字 << <a href='數字.html'>Previous</a> <br /><h1>w14</h1>
+<p>1.<a href="https://youtu.be/rrwzZsYP2oQ">https://youtu.be/rrwzZsYP2oQ</a></p>
+<p>2.<a href="https://youtu.be/FP285lfJEZw">https://youtu.be/FP285lfJEZw</a></p>
+<p>3.<a href="https://youtu.be/aEaHIXD-8AQ">https://youtu.be/aEaHIXD-8AQ</a></p>
+<p>前言</p>
+<p data-end="152" data-start="92">跟著老師的步驟，從一開始完全沒有碰過程式設計，到現在能夠依照老師的指示，做出一個能看的作品，讓我十分感動。</p>
+<p>內文</p>
+<p data-end="401" data-start="163">先是從 GitHub 的註冊開始，接著學習如何將專案透過<span> </span><code data-end="208" data-start="197">git clone</code><span> </span>下載到近端進行操作，在本機完成修改與練習後，再使用<span> </span><code data-end="245" data-start="235">git push</code><span> </span>將成果上傳回 GitHub。透過這樣的流程，我逐漸理解版本控制的概念，也更清楚程式從寫到整理與管理的實際運作方式。<br data-end="307" data-start="304"/>同時，在老師的教學下建立個人網頁，並開始寫 Python 程式語言，從一開始寫一些相對簡單的程式，到後來能夠完成多個老師的作業，每一步都是非常辛苦，也讓我對程式的邏輯與流程有更深的理解。</p>
+<p>結尾</p>
+<p data-end="494" data-start="412">從完全沒有基礎，到現在能夠實際完成作品，這段學習經驗讓我獲益良多，不只是學到程式語言本身，也培養了對工具使用與問題解決的能力，讓我對程式設計產生更多的信心與成就感。</p>
+<p>
+<script>
+function getUrlParam(key) {
+  return new URLSearchParams(window.location.search).get(key);
+}
+function updateUrlParam(key, value) {
+  const url = new URL(window.location);
+  url.searchParams.set(key, value);
+  window.history.replaceState({}, "", url);
+}
 
-CELL_SIZE = 40
-WALL_THICKNESS = 6
-IMG_PATH = "https://mde.tw/cp2025/reeborg/src/images/"
+let pyodide, editor1, editor2;
 
-class World:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.layers = self._create_layers()
-        self._init_html()
-        self._draw_grid()
-        self._draw_walls()
-    
-    def _create_layers(self):
-        return {
-            "grid": html.CANVAS(width=self.width * CELL_SIZE, height=self.height * CELL_SIZE),
-            "walls": html.CANVAS(width=self.width * CELL_SIZE, height=self.height * CELL_SIZE),
-            "objects": html.CANVAS(width=self.width * CELL_SIZE, height=self.height * CELL_SIZE),
-            "robots": html.CANVAS(width=self.width * CELL_SIZE, height=self.height * CELL_SIZE),
-        }
+// 新增：把 robot_w_world.py 寫入 pyodide FS
+async function loadRobotModule() {
+  const robotUrl = "https://gist.githubusercontent.com/mdecycu/ec4bb35dd0769e7a83d2a9fa57878a67/raw/9f43571ec070ea3e24b083525ee27275a96efcc8/robot_w_world.py";
+  const r = await fetch(robotUrl);
+  if (!r.ok) throw new Error(`載入 robot.py 失敗: ${r.status}`);
+  const code = await r.text();
+  pyodide.FS.writeFile("/robot.py", code);
+  pyodide.runPython(`import sys; sys.path.append("/")`);  // 加入根目錄到 sys.path
+}
 
-    def _init_html(self):
-        container = html.DIV(style={
-            "position": "relative",
-            "width": f"{self.width * CELL_SIZE}px",
-            "height": f"{self.height * CELL_SIZE}px"
-        })
-        for z, canvas in enumerate(self.layers.values()):
-            canvas.style = {
-                "position": "absolute",
-                "top": "0px",
-                "left": "0px",
-                "zIndex": str(z)
-            }
-            container &lt;= canvas
-        
-        # Add control buttons for mobile
-        button_container = html.DIV(style={
-            "margin-top": "10px",
-            "text-align": "center"
-        })
-        move_button = html.BUTTON("Move Forward (j)", id="move_button")
-        turn_button = html.BUTTON("Turn Left (i)", id="turn_button")
-        button_container &lt;= move_button
-        button_container &lt;= turn_button
-        
-        document["brython_div1"].clear()
-        document["brython_div1"] &lt;= container
-        document["brython_div1"] &lt;= button_container
-    
-    def _draw_grid(self):
-        ctx = self.layers["grid"].getContext("2d")
-        ctx.strokeStyle = "#cccccc"
-        for i in range(self.width + 1):
-            ctx.beginPath()
-            ctx.moveTo(i * CELL_SIZE, 0)
-            ctx.lineTo(i * CELL_SIZE, self.height * CELL_SIZE)
-            ctx.stroke()
-        for j in range(self.height + 1):
-            ctx.beginPath()
-            ctx.moveTo(0, j * CELL_SIZE)
-            ctx.lineTo(self.width * CELL_SIZE, j * CELL_SIZE)
-            ctx.stroke()
+document.addEventListener("DOMContentLoaded", async () => {
+  editor1 = ace.edit("kw_editor1");
+  editor1.setTheme("ace/theme/chrome");
+  editor1.session.setMode("ace/mode/python");
 
-    def _draw_image(self, ctx, src, x, y, w, h, offset_x=0, offset_y=0):
-        img = html.IMG()
-        img.src = src
-        def onload(evt):
-            px = x * CELL_SIZE + offset_x
-            py = (self.height - 1 - y) * CELL_SIZE + offset_y
-            ctx.drawImage(img, px, py, w, h)
-        img.bind("load", onload)
-    
-    def _draw_walls(self):
-        ctx = self.layers["walls"].getContext("2d")
-        for x in range(self.width):
-            # North wall
-            self._draw_image(ctx, IMG_PATH + "north.png", x, self.height - 1,
-                             CELL_SIZE, WALL_THICKNESS, offset_y=0)
-            # South wall
-            self._draw_image(ctx, IMG_PATH + "north.png", x, 0,
-                             CELL_SIZE, WALL_THICKNESS, offset_y=CELL_SIZE - WALL_THICKNESS)
-        for y in range(self.height):
-            # West wall
-            self._draw_image(ctx, IMG_PATH + "east.png", 0, y,
-                             WALL_THICKNESS, CELL_SIZE, offset_x=0)
-            # East wall
-            self._draw_image(ctx, IMG_PATH + "east.png", self.width - 1, y,
-                             WALL_THICKNESS, CELL_SIZE, offset_x=CELL_SIZE - WALL_THICKNESS)
+  editor2 = ace.edit("kw_editor2");
+  editor2.setTheme("ace/theme/chrome");
+  editor2.session.setMode("ace/mode/python");
 
-    def robot(self, x, y):
-        ctx = self.layers["robots"].getContext("2d")
-        self._draw_image(ctx, IMG_PATH + "blue_robot_e.png", x - 1, y - 1,
-                         CELL_SIZE, CELL_SIZE)
+  pyodide = await loadPyodide();
+  await pyodide.loadPackage(["numpy", "scipy", "matplotlib", "micropip"]);
 
-class AnimatedRobot:
-    def __init__(self, world, x, y):
-        self.world = world
-        self.x = x - 1
-        self.y = y - 1
-        self.facing = "E"
-        self.facing_order = ["E", "N", "W", "S"]
-        self.robot_ctx = world.layers["robots"].getContext("2d")
-        self.trace_ctx = world.layers["objects"].getContext("2d")
-        self.queue = []
-        self.running = False
-        self._draw_robot()
-    
-    def _robot_image(self):
-        return {
-            "E": "blue_robot_e.png",
-            "N": "blue_robot_n.png",
-            "W": "blue_robot_w.png",
-            "S": "blue_robot_s.png"
-        }[self.facing]
+  // 預先載入 robot.py
+  await loadRobotModule();
 
-    def _draw_robot(self):
-        self.robot_ctx.clearRect(0, 0, self.world.width * CELL_SIZE, self.world.height * CELL_SIZE)
-        self.world._draw_image(self.robot_ctx, IMG_PATH + self._robot_image(),
-                               self.x, self.y, CELL_SIZE, CELL_SIZE)
+  // 你現有的 hello() 定義
+  const code = `
+def hello():
+    print("Hello from custom module!")
+`;
+  pyodide.runPython(code);
 
-    def _draw_trace(self, from_x, from_y, to_x, to_y):
-        ctx = self.trace_ctx
-        ctx.strokeStyle = "#d33"
-        ctx.lineWidth = 2
-        ctx.beginPath()
-        fx = from_x * CELL_SIZE + CELL_SIZE / 2
-        fy = (self.world.height - 1 - from_y) * CELL_SIZE + CELL_SIZE / 2
-        tx = to_x * CELL_SIZE + CELL_SIZE / 2
-        ty = (self.world.height - 1 - to_y) * CELL_SIZE + CELL_SIZE / 2
-        ctx.moveTo(fx, fy)
-        ctx.lineTo(tx, ty)
-        ctx.stroke()
+  // 這是你之前其他按鈕用的 Gist 連結
+  const GIST_ADD1TO100 =
+    "https://gist.githubusercontent.com/mdecourse/0229a8a017091476a79700b8a190f185/raw/" +
+    "c48e37714f055c3a0027cbfef59e442a6ef659b9/from_1_add_to_100_1.py";
+  const NUMPY_ODE =
+    "https://gist.githubusercontent.com/mdecycu/ec4bb35dd0769e7a83d2a9fa57878a67/raw/" +
+    "98d582539545b3c9fbfa35dd3e605c506367618e/pyodide_ode_ex1.py";
+  const PYODIDE_ROBOT_ANIMATION =
+    "https://gist.githubusercontent.com/mdecycu/ec4bb35dd0769e7a83d2a9fa57878a67/raw/" +
+    "ff833d14181c7e270d37432aa8589f5ecf00e383/pyodide_walk_around2.py";
+  const FREE_WALK = 
+    "https://gist.githubusercontent.com/mdecycu/ec4bb35dd0769e7a83d2a9fa57878a67/raw/" + "2a66dceb4a1dbdd0c384d4d17453f1e4f03f2493/pyodide_free_walk2.py"
 
-    def move(self, steps):
-        def action(next_done):
-            def step():
-                nonlocal steps
-                if steps == 0:
-                    next_done()
-                    return
-                from_x, from_y = self.x, self.y
-                dx, dy = 0, 0
-                if self.facing == "E":
-                    dx = 1
-                elif self.facing == "W":
-                    dx = -1
-                elif self.facing == "N":
-                    dy = 1
-                elif self.facing == "S":
-                    dy = -1
-                next_x = self.x + dx
-                next_y = self.y + dy
-    
-                # Boundary check
-                if 0 &lt;= next_x &lt; self.world.width and 0 &lt;= next_y &lt; self.world.height:
-                    self.x, self.y = next_x, next_y
-                    self._draw_trace(from_x, from_y, self.x, self.y)
-                    self._draw_robot()
-                    steps -= 1
-                    timer.set_timeout(step, 200)
-                else:
-                    print("🚨 已經撞牆，停止移動！")
-                    next_done()
-            step()
-        self.queue.append(action)
-        self._run_queue()
+  // 預設載入 GIST_ADD1TO100（或 URL 參數決定）
+  const src = getUrlParam("src");
+  if (src === PYODIDE_ROBOT_ANIMATION) {
+    const robotCode = await fetchCode(PYODIDE_ROBOT_ANIMATION);
+    editor1.setValue(robotCode, -1);
+    updateUrlParam("src", PYODIDE_ROBOT_ANIMATION);
+    runPyodide(editor1, "kw_console1", "brython_div1");
+  } else {
+    const initialCode = await fetchCode(src || GIST_ADD1TO100);
+    editor1.setValue(initialCode, -1);
+    runPyodide(editor1, "kw_console1", "brython_div1");
+  }
 
-    def turn_left(self):
-        def action(done):
-            idx = self.facing_order.index(self.facing)
-            self.facing = self.facing_order[(idx + 1) % 4]
-            self._draw_robot()
-            timer.set_timeout(done, 300)
-        self.queue.append(action)
-        self._run_queue()
+  editor2.setValue("", -1);
 
-    def _run_queue(self):
-        if self.running or not self.queue:
-            return
-        self.running = True
-        action = self.queue.pop(0)
-        action(lambda: self._done())
+  // 按鈕事件
+  document.getElementById("version").onclick = () => {
+    const vcode = `
+import pyodide
+import sys
+import matplotlib
+import numpy
+import scipy
+print("Pyodide version:", pyodide.__version__)
+print("Python version :", sys.version)
+print("matplotlib version:", matplotlib.__version__)
+print("numpy version:", numpy.__version__)
+print("scipy version:", scipy.__version__)
+`;
+    editor1.setValue(vcode, -1);
+    updateUrlParam("src", "inline_version");
+    runPyodide(editor1, "kw_console1", "brython_div1");
+  };
 
-    def _done(self):
-        self.running = False
-        self._run_queue()
+  document.getElementById("hello_button").onclick = () => {
+    editor1.setValue("hello()", -1);
+    updateUrlParam("src", "inline_hello");
+    runPyodide(editor1, "kw_console1", "brython_div1");
+  };
 
-# Create world and robot
-w = World(10, 10)
-w.robot(1, 1)
-r = AnimatedRobot(w, 1, 1)
+  document.getElementById("add1to100").onclick = async () => {
+    const c = await fetchCode(GIST_ADD1TO100);
+    editor1.setValue(c, -1);
+    updateUrlParam("src", GIST_ADD1TO100);
+    runPyodide(editor1, "kw_console1", "brython_div1");
+  };
 
-# Bind keyboard events
-@bind(document, "keydown")
-def keydown(evt):
-    if evt.key == "j":
-        r.move(1)
-    elif evt.key == "i":
-        r.turn_left()
+  document.getElementById("numpy_ode").onclick = async () => {
+    const c = await fetchCode(NUMPY_ODE);
+    editor1.setValue(c, -1);
+    updateUrlParam("src", NUMPY_ODE);
+    runPyodide(editor1, "kw_console1", "brython_div1");
+  };
 
-# Bind button events
-@bind(document["move_button"], "click")
-def move_click(evt):
-    r.move(1)
+  document.getElementById("robot1").onclick = async () => {
+    const rc = await fetchCode(PYODIDE_ROBOT_ANIMATION);
+    editor1.setValue(rc, -1);
+    updateUrlParam("src", PYODIDE_ROBOT_ANIMATION);
+    runPyodide(editor1, "kw_console1", "brython_div1");
+  };
 
-@bind(document["turn_button"], "click")
-def turn_click(evt):
-    r.turn_left()
+  document.getElementById("free_walk").onclick = async () => {
+    const rc = await fetchCode(FREE_WALK);
+    editor1.setValue(rc, -1);
+    updateUrlParam("src", FREE_WALK);
+    runPyodide(editor1, "kw_console1", "brython_div1");
+  };
 
-# Initial patrol (optional, can be removed if only keyboard/button control is desired)
-r.move(9)
-r.turn_left()
-r.move(4)
-r.turn_left()
-r.move(6)
-r.turn_left()
-r.turn_left()
-r.move(6)
-r.turn_left()
-r.move(5)
-r.turn_left()
-r.move(9)</pre>
-<br />w3 << <a href='w3.html'>Previous</a> <a href='w7 1b.html'>Next</a> >> w7 1b</div>
+  document.getElementById("add1to100part2").onclick = async () => {
+    const c = await fetchCode(GIST_ADD1TO100);
+    editor2.setValue(c, -1);
+    runPyodide(editor2, "kw_console2", "brython_div2");
+  };
+
+  document.getElementById("kw_run1").onclick = () =>
+    runPyodide(editor1, "kw_console1", "brython_div1");
+  document.getElementById("kw_run2").onclick = () =>
+    runPyodide(editor2, "kw_console2", "brython_div2");
+  document.getElementById("kw_clear_console1").onclick = () =>
+    clearOutput("kw_console1", "brython_div1");
+  document.getElementById("kw_clear_console2").onclick = () =>
+    clearOutput("kw_console2", "brython_div2");
+});
+
+// 調整 output textarea 行數
+document.getElementById("kw_output1").onclick = () => {
+  const ta = document.getElementById("kw_console1");
+  ta.rows = "15";
+  ta.cols = "70";
+  ta.scrollTop = 0;
+};
+document.getElementById("kw_output2").onclick = () => {
+  const ta = document.getElementById("kw_console2");
+  ta.rows = "15";
+  ta.cols = "70";
+  ta.scrollTop = 0;
+};
+
+async function fetchCode(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`載入失敗 ${r.status}`);
+  return await r.text();
+}
+
+function clearOutput(consoleId, divId) {
+  document.getElementById(consoleId).value = "";
+  document.getElementById(divId).innerHTML = "";
+}
+
+async function runPyodide(editor, consoleId, divId) {
+  document.getElementById(consoleId).value = "";
+  document.getElementById(divId).innerHTML = "";
+
+  await pyodide.runPythonAsync(`
+import sys
+class JsWriter:
+  def write(self, s):
+    from js import document
+    ta = document.getElementById("${consoleId}")
+    ta.value += s
+    ta.scrollTop = ta.scrollHeight
+sys.stdout = JsWriter()
+sys.stderr = JsWriter()
+`);
+
+  try {
+    await pyodide.runPythonAsync(editor.getValue());
+  } catch (e) {
+    document.getElementById(consoleId).value += "\\n錯誤：" + e.toString();
+  }
+}
+</script>
+</p><br />數字 << <a href='數字.html'>Previous</a> </div>
         
     <!-- footer -->
       <div class="container">
